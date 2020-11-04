@@ -2,11 +2,11 @@ package pl.posmapas.key_dependency.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class Schema {
     private Attribute[] schema;
     private FunctionalDependency[] dependencies;
-
     Schema(Attribute[] schema) {
         this.schema = schema;
     }
@@ -61,6 +61,56 @@ public class Schema {
         tmp[length] = dependency;
         dependencies = tmp;
     }
+
+    public NormalForm getNormalForm(){
+
+        if(isRelationInBoyceCoddNormalForm(dependencies,this)){
+            return NormalForm.BOYCE_CODD;
+        }
+        if(isRelationInThirdNormalForm(dependencies,this)){
+            return NormalForm.THIRD;
+        }
+        if(isRelationInSecondNormalForm(dependencies,this)){
+            return NormalForm.SECOND;
+        }
+        return  NormalForm.FIRST;
+    }
+
+    public static boolean isRelationInBoyceCoddNormalForm(FunctionalDependency[] dependencies, Schema schema){
+        for (FunctionalDependency dependency : dependencies){
+            DependencyType dependencyType = FunctionalDependency.dependencyType(dependency, schema);
+            if (dependencyType != DependencyType.TRIVIAL && dependencyType != DependencyType.KEY ){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean isRelationInThirdNormalForm(FunctionalDependency[] dependencies, Schema schema){
+
+        for (FunctionalDependency dependency : dependencies){
+            DependencyType dependencyType = FunctionalDependency.dependencyType(dependency, schema);
+            if (dependencyType != DependencyType.TRIVIAL && dependencyType != DependencyType.KEY
+                && dependencyType != DependencyType.KEY_ATTRIBUTE_ON_THE_RIGHT){
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    public static boolean isRelationInSecondNormalForm(FunctionalDependency[] dependencies, Schema schema){
+
+        for (FunctionalDependency dependency : dependencies){
+            DependencyType dependencyType = FunctionalDependency.dependencyType(dependency, schema);
+            if (dependencyType == DependencyType.PARTIAL){
+                return false;
+            }
+        }
+        return true;
+    }
+
+
 
     public ArrayList<Attribute[]> findSuperKeys() {
 
@@ -161,7 +211,7 @@ public class Schema {
         return  wasSomethingChanged;
     }
 
-    private static boolean consist(Attribute[] main , Attribute[] candidate){
+    public  static boolean consist(Attribute[] main , Attribute[] candidate){
 
 
         boolean[] trueTable = new boolean[candidate.length];
@@ -223,6 +273,25 @@ public class Schema {
 
         for (FunctionalDependency dept : dependencies) {
             sb.append(dept).append('\n');
+        }
+
+        return sb.toString();
+    }
+
+    public String allInfo(){
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Schema  ").append(Arrays.toString(schema)).append('\n');
+        sb.append("Relation is in ").append(getNormalForm()).append(" normal form \n");
+
+        for (FunctionalDependency dept : dependencies) {
+            sb.append(dept).append(" ").append(FunctionalDependency.dependencyType(dept,this)).append('\n');
+        }
+
+        sb.append("Keys").append('\n');
+        int index = 1;
+        for (Attribute[] a: findKeys()) {
+            sb.append("K").append(index++).append(" = ").append(Arrays.toString(a)).append(", ");
         }
 
         return sb.toString();

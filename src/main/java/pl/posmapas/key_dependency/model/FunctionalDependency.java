@@ -1,11 +1,14 @@
 package pl.posmapas.key_dependency.model;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class FunctionalDependency {
-    Attribute[] leftSide;
-    Attribute[] rightSide;
+    private Attribute[] leftSide;
+    private Attribute[] rightSide;
 
+    private DependencyType dependencyType;
 
     public FunctionalDependency(Attribute[] leftSide, Attribute[] rightSide) {
         this.leftSide = leftSide;
@@ -54,6 +57,90 @@ public class FunctionalDependency {
         }
         return true;
     }
+
+    public static DependencyType dependencyType(FunctionalDependency dependency, Schema schema) {
+        ArrayList<Attribute[]> keys = schema.findKeys();
+        if ( isDependencyKeyDependency(dependency, keys)){
+            return DependencyType.KEY;
+        }
+
+        if ( isDependencyTrivial(dependency)){
+            return DependencyType.TRIVIAL;
+        }
+
+        if (isDependencyKeyAttributeOnTheRight(dependency,keys)){
+            return DependencyType.KEY_ATTRIBUTE_ON_THE_RIGHT;
+        }
+
+        if(isDependencyPartialDependency(dependency,keys)){
+            return DependencyType.PARTIAL;
+        }
+
+        return DependencyType.TRANSITIVE;
+
+
+    }
+
+    public static boolean isDependencyPartialDependency(FunctionalDependency dependency , List<Attribute[]> keys){
+        boolean isInSomeKey;
+
+        for (Attribute a :dependency.getLeftSide()) {
+            isInSomeKey = false;
+            for (Attribute[] key : keys){
+                for (Attribute b : key){
+                    if (a.equals(b)){
+                        isInSomeKey = true;
+                        break;
+                    }
+                }
+                if(isInSomeKey){
+                    break;
+                }
+            }
+            if (!isInSomeKey){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean isDependencyKeyAttributeOnTheRight(FunctionalDependency dependency, List<Attribute[]> keys){
+        for (Attribute a : dependency.getRightSide()){
+            for (Attribute[] key : keys ) {
+                for (Attribute b : key){
+                    if (a.equals(b)){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+
+    }
+
+    public static boolean isDependencyKeyDependency(FunctionalDependency dependency, List<Attribute[]> keys){
+
+        for (Attribute[] key: keys) {
+            if (Arrays.equals(key, dependency.leftSide)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isDependencyTrivial(FunctionalDependency dependency) {
+        for (Attribute a : dependency.getRightSide()) {
+            for (Attribute b : dependency.getLeftSide()) {
+                if (a.equals(b)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+
 
     @Override
     public int hashCode() {

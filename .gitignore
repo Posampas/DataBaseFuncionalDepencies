@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### TEST Clases ###
+/src/main./java/pl/posampas/key_depenedcy/model/TestMain.java

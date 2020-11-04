@@ -1,9 +1,12 @@
 package pl.posmapas.key_dependency.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Attribute {
-    String name;
+    private String name;
+
 
     public Attribute(String name) {
         this.name = name;
@@ -26,6 +29,8 @@ public class Attribute {
         Attribute attribute = (Attribute) o;
         return Objects.equals(name, attribute.name);
     }
+
+
 
 
 }
