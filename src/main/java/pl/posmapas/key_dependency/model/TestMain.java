@@ -6,18 +6,18 @@ public class TestMain {
 
     public static void main(String[] args) {
         Schema schema = new Schema(
-                new Attribute[]{new Attribute("f"), new Attribute("g"),
+                new Attribute[]{new Attribute("g"), new Attribute("f"),
                         new Attribute("h"), new Attribute("i")});
 
         schema.addDependency(
                 new FunctionalDependency(
-                        new Attribute[]{schema.getAttribute("f"), schema.getAttribute("h"), schema.getAttribute("i")},
+                        new Attribute[]{schema.getAttribute("i"), schema.getAttribute("h"), schema.getAttribute("f")},
                         new Attribute[]{schema.getAttribute("g")}));
 
-/*        schema.addDependency(
+        schema.addDependency(
                 new FunctionalDependency(
                         new Attribute[]{schema.getAttribute("g")},
-                        new Attribute[]{schema.getAttribute("h")}));*/
+                        new Attribute[]{schema.getAttribute("h")}));
 
         schema.addDependency(
                 new FunctionalDependency(

@@ -121,11 +121,30 @@ public class FunctionalDependency {
     public static boolean isDependencyKeyDependency(FunctionalDependency dependency, List<Attribute[]> keys){
 
         for (Attribute[] key: keys) {
-            if (Arrays.equals(key, dependency.leftSide)){
+
+            if (areDepencetisEquals(key,dependency)){
                 return true;
             }
+
         }
         return false;
+    }
+
+    private static boolean areDepencetisEquals(Attribute[] key, FunctionalDependency dependency){
+
+        for (Attribute attribute : key) {
+            boolean isTheSame = false;
+            for (int j = 0; j < dependency.leftSide.length; j++) {
+                if (attribute.equals(dependency.leftSide[j])) {
+                    isTheSame = true;
+                    break;
+                }
+            }
+            if (!isTheSame){
+                return false;
+            }
+        }
+        return true;
     }
 
     public static boolean isDependencyTrivial(FunctionalDependency dependency) {

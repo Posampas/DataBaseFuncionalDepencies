@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Schema {
     private Attribute[] schema;
-    private FunctionalDependency[] dependencies;
+    private FunctionalDependency[] dependencies = new FunctionalDependency[]{};
     Schema(Attribute[] schema) {
         this.schema = schema;
     }
