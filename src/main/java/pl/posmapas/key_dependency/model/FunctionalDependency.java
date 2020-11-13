@@ -2,6 +2,7 @@ package pl.posmapas.key_dependency.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class FunctionalDependency {
@@ -122,7 +123,7 @@ public class FunctionalDependency {
 
         for (Attribute[] key: keys) {
 
-            if (areDepencetisEquals(key,dependency)){
+            if (areDependenciesEquals(key,dependency)){
                 return true;
             }
 
@@ -130,7 +131,7 @@ public class FunctionalDependency {
         return false;
     }
 
-    private static boolean areDepencetisEquals(Attribute[] key, FunctionalDependency dependency){
+    private static boolean areDependenciesEquals(Attribute[] key, FunctionalDependency dependency){
 
         for (Attribute attribute : key) {
             boolean isTheSame = false;
@@ -158,7 +159,16 @@ public class FunctionalDependency {
         return false;
     }
 
-
+    public Attribute[] getAllAttributes(){
+        ArrayList<Attribute> list = new ArrayList<>();
+        Collections.addAll(list, leftSide);
+        for (Attribute a: rightSide) {
+            if (!list.contains(a)){
+                list.add(a);
+            }
+        }
+        return  list.toArray(new Attribute[0]);
+    }
 
 
     @Override

@@ -10,6 +10,7 @@ public class Schema {
     Schema(Attribute[] schema) {
         this.schema = schema;
     }
+    private Schema orginSchema = null;
 
 
     Attribute getAttribute(String name) {
@@ -22,6 +23,9 @@ public class Schema {
         return null;
     }
 
+    public Attribute[] getAttributes() {
+        return schema;
+    }
 
     public FunctionalDependency[] getDependencies() {
         return dependencies;
@@ -37,6 +41,12 @@ public class Schema {
 
     }
 
+    public void setOrginSchema(Schema originSchema) {
+        this.orginSchema = originSchema;
+    }
+    Schema getOrginSchema(){
+        return orginSchema;
+    }
 
     private void ifDependenciesAreNull(FunctionalDependency dependency) {
         if (dependencies == null) {
@@ -170,7 +180,7 @@ public class Schema {
 
         expandResultWithDependencies(result);
 
-        return consist(result, schema);
+        return consist(result.toArray(Attribute[]::new), schema);
     }
 
 
@@ -201,7 +211,7 @@ public class Schema {
         boolean wasSomethingChanged = false;
         for (int i = 0; i < dependencies.length; i++) {
 
-            if (!wasDependencyUsed[i] && consist(result, dependencies[i].getLeftSide())) {
+            if (!wasDependencyUsed[i] && consist(result.toArray(new Attribute[0]), dependencies[i].getLeftSide())) {
                 addAttributeToTheResult(dependencies[i].getRightSide(), result);
                 wasDependencyUsed[i] = true;
                 wasSomethingChanged = true;
@@ -214,40 +224,21 @@ public class Schema {
     public  static boolean consist(Attribute[] main , Attribute[] candidate){
 
 
-        boolean[] trueTable = new boolean[candidate.length];
-
-        for (int i = 0; i < candidate.length; i++) {
+        for (Attribute attribute : candidate) {
+            boolean isInArray = false;
             for (Attribute m : main) {
-                if (m.equals(candidate[i])) {
-                    trueTable[i] = true;
+                if (m.equals(attribute)) {
+                    isInArray = true;
                     break;
                 }
             }
-            if (!trueTable[i]) {
+            if (!isInArray) {
                 return false;
             }
         }
         return true;
     }
-    private boolean consist(ArrayList<Attribute> main, Attribute[] candidate) {
 
-        boolean[] trueTable = new boolean[candidate.length];
-
-        for (int i = 0; i < candidate.length; i++) {
-            for (Attribute m : main) {
-                if (m.equals(candidate[i])) {
-                    trueTable[i] = true;
-                    break;
-                }
-            }
-            if (!trueTable[i]) {
-                return false;
-            }
-        }
-        return true;
-
-
-    }
 
     static void combinations(Attribute[] schema, int len, int startPosition, Attribute[] result, ArrayList<Attribute[]> possibilites) {
         if (len == 0) {
@@ -281,7 +272,10 @@ public class Schema {
     public String allInfo(){
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Schema  ").append(Arrays.toString(schema)).append('\n');
+        sb.append("Schema  ").append(Arrays.toString(schema));
+        if (orginSchema != null){
+            sb.append(" <-------------- <Derived form schema : " + Arrays.toString(orginSchema.getAttributes()) + " \n");
+        }
         sb.append("Relation is in ").append(getNormalForm()).append(" normal form \n");
 
         for (FunctionalDependency dept : dependencies) {
